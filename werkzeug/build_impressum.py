@@ -26,6 +26,14 @@ page = f'''<!DOCTYPE html>
 <html lang="de">
 <head>
 <meta charset="utf-8">
+<script>
+(function(){{
+  try {{
+    var t = localStorage.getItem("fw-theme");
+    if (t === "hell" || t === "dunkel") document.documentElement.setAttribute("data-theme", t);
+  }} catch (e) {{ /* z. B. Privatmodus */ }}
+}})();
+</script>
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="theme-color" content="#3e2a78">
 <title>Impressum – FaireWelt Hilfeinfos</title>
@@ -43,18 +51,50 @@ page = f'''<!DOCTYPE html>
   --schatten:0 1px 3px rgba(34,28,51,.08),0 4px 16px rgba(34,28,51,.06);
   --display:"Manrope","Segoe UI",system-ui,sans-serif;
   --text:"Atkinson Hyperlegible","Segoe UI",system-ui,sans-serif;
+  color-scheme:light;
+}}
+@media (prefers-color-scheme:dark){{
+  :root:not([data-theme="hell"]){{
+    --papier:#15121f; --karte:#1e1a2b; --tinte:#f1eef7; --nebel:#a79fc0;
+    --violett:#7c3aed; --violett-tief:#9061f9; --violett-hell:#241c3d;
+    --linie:#2e293f; --linie-stark:#453d5c;
+    --schatten:0 1px 3px rgba(0,0,0,.4),0 4px 20px rgba(0,0,0,.35);
+    color-scheme:dark;
+  }}
+}}
+:root[data-theme="dunkel"]{{
+  --papier:#15121f; --karte:#1e1a2b; --tinte:#f1eef7; --nebel:#a79fc0;
+  --violett:#7c3aed; --violett-tief:#9061f9; --violett-hell:#241c3d;
+  --linie:#2e293f; --linie-stark:#453d5c;
+  --schatten:0 1px 3px rgba(0,0,0,.4),0 4px 20px rgba(0,0,0,.35);
+  color-scheme:dark;
 }}
 *{{box-sizing:border-box}}
 body{{
   margin:0;background:var(--papier);color:var(--tinte);
   font-family:var(--text);font-size:17px;line-height:1.55;
   -webkit-tap-highlight-color:rgba(75,53,145,.15);
+  transition:background-color .2s ease,color .2s ease;
 }}
 a{{color:var(--violett)}}
 a:focus-visible,button:focus-visible{{outline:3px solid var(--violett);outline-offset:2px;border-radius:6px}}
 .ic{{width:1.1em;height:1.1em;flex:none;vertical-align:-.16em}}
 .kopf{{background:var(--karte);border-bottom:1px solid var(--linie)}}
 .kopf-innen{{max-width:900px;margin:0 auto;padding:26px 20px 22px;display:flex;gap:18px;align-items:center;flex-wrap:wrap}}
+.kopf-titel{{flex:1;min-width:200px}}
+.theme-knopf{{
+  display:flex;align-items:center;gap:7px;flex:none;
+  font-family:var(--display);font-weight:700;font-size:.92rem;
+  padding:9px 14px;border-radius:10px;border:1.5px solid var(--linie-stark);
+  background:var(--karte);color:var(--nebel);cursor:pointer;min-height:44px;
+}}
+.theme-knopf:hover{{border-color:var(--violett);color:var(--violett)}}
+.theme-knopf[aria-pressed="true"]{{background:var(--violett-hell);border-color:var(--violett);color:var(--violett)}}
+.theme-mond{{display:block}}
+.theme-sonne{{display:none}}
+.theme-knopf[aria-pressed="true"] .theme-mond{{display:none}}
+.theme-knopf[aria-pressed="true"] .theme-sonne{{display:block}}
+@media (max-width:520px){{.theme-text{{display:none}}.theme-knopf{{padding:9px 12px}}}}
 .kopf img{{width:64px;height:64px;border-radius:50%;flex:none;box-shadow:var(--schatten)}}
 .kopf h1{{font-family:var(--display);font-weight:800;font-size:clamp(1.4rem,3.4vw,1.9rem);margin:0;letter-spacing:-.01em}}
 .kopf h1 .fw{{color:var(--violett)}}
@@ -118,6 +158,7 @@ footer{{border-top:1px solid var(--linie);background:var(--karte)}}
 #qrDialog{{
   border:none;border-radius:var(--rund);padding:22px 24px;max-width:340px;width:calc(100vw - 40px);
   box-shadow:0 12px 48px rgba(34,28,51,.35);color:var(--tinte);font-family:var(--text);
+  background:var(--karte);
 }}
 #qrDialog::backdrop{{background:rgba(34,28,51,.55);backdrop-filter:blur(3px)}}
 .qr-kopf{{display:flex;align-items:flex-start;gap:12px}}
@@ -155,10 +196,15 @@ footer{{border-top:1px solid var(--linie);background:var(--karte)}}
 <header class="kopf">
   <div class="kopf-innen">
     <img src="data:image/webp;base64,{LOGO}" alt="" width="64" height="64">
-    <div>
+    <div class="kopf-titel">
       <h1><span class="fw">FaireWelt</span> Hilfeinfos – Impressum</h1>
       <a class="zurueck" href="index.html">← Zurück zu den Hilfeinformationen</a>
     </div>
+    <button class="theme-knopf" id="themeKnopf" type="button" aria-pressed="false" title="Nachtsicht: dunkle, blendfreie Ansicht">
+      <svg class="ic theme-mond" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+      <svg class="ic theme-sonne" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
+      <span class="theme-text">Nachtsicht</span>
+    </button>
   </div>
 </header>
 
@@ -258,6 +304,52 @@ footer{{border-top:1px solid var(--linie);background:var(--karte)}}
 <script>
 (function(){{
   "use strict";
+
+  // ----- Nachtsicht: Umschalter, Systemerkennung, theme-color-Meta -----
+  var themeKnopf = document.getElementById("themeKnopf");
+  var systemDunkel = window.matchMedia("(prefers-color-scheme: dark)");
+  var themeMeta = document.querySelector('meta[name="theme-color"]');
+
+  function gespeichertesTheme(){{
+    try {{ return localStorage.getItem("fw-theme"); }} catch (e) {{ return null; }}
+  }}
+  function themeMerken(wert){{
+    try {{
+      if (wert) localStorage.setItem("fw-theme", wert);
+      else localStorage.removeItem("fw-theme");
+    }} catch (e) {{ /* z. B. Privatmodus */ }}
+  }}
+  function effektivDunkel(){{
+    var gespeichert = gespeichertesTheme();
+    if (gespeichert === "dunkel") return true;
+    if (gespeichert === "hell") return false;
+    return systemDunkel.matches;
+  }}
+  function themeAnzeigeAktualisieren(){{
+    var dunkel = effektivDunkel();
+    themeKnopf.setAttribute("aria-pressed", dunkel ? "true" : "false");
+    themeKnopf.querySelector(".theme-text").textContent = dunkel ? "Tagsicht" : "Nachtsicht";
+    if (themeMeta) themeMeta.setAttribute("content", dunkel ? "#15121f" : "#3e2a78");
+  }}
+  themeKnopf.addEventListener("click", function(){{
+    var neuDunkel = !effektivDunkel();
+    if (neuDunkel === systemDunkel.matches) {{
+      document.documentElement.removeAttribute("data-theme");
+      themeMerken(null);
+    }} else {{
+      var wert = neuDunkel ? "dunkel" : "hell";
+      document.documentElement.setAttribute("data-theme", wert);
+      themeMerken(wert);
+    }}
+    themeAnzeigeAktualisieren();
+  }});
+  if (systemDunkel.addEventListener) {{
+    systemDunkel.addEventListener("change", function(){{
+      if (!gespeichertesTheme()) themeAnzeigeAktualisieren();
+    }});
+  }}
+  themeAnzeigeAktualisieren();
+
   var QR = __QRDATEN__;
   var istDesktop = window.matchMedia("(hover: hover) and (pointer: fine)").matches &&
                    !/Android|iPhone|iPad|iPod|Mobile|Windows Phone/i.test(navigator.userAgent);

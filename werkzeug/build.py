@@ -161,6 +161,14 @@ page = f'''<!DOCTYPE html>
 <html lang="de">
 <head>
 <meta charset="utf-8">
+<script>
+(function(){{
+  try {{
+    var t = localStorage.getItem("fw-theme");
+    if (t === "hell" || t === "dunkel") document.documentElement.setAttribute("data-theme", t);
+  }} catch (e) {{ /* z. B. Privatmodus – dann greift automatisch die Systemeinstellung */ }}
+}})();
+</script>
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="theme-color" content="#3e2a78">
 <title>FaireWelt Hilfeinfos – Hilfetelefone &amp; Beratungsstellen für D-A-CH</title>
@@ -178,9 +186,38 @@ page = f'''<!DOCTYPE html>
   --de:#b98514; --at:#b3453f; --ch:#2e8c82;
   --rund:14px; --rund-klein:10px;
   --schatten:0 1px 3px rgba(34,28,51,.08),0 4px 16px rgba(34,28,51,.06);
+  --werkzeuge-bg:rgba(255,255,255,.96);
+  --rot-rand:#e8c4bd; --violett-rand:#d8cdf0; --platzhalter:#eceae6; --platzhalter-schrift:#9a95a8;
   --display:"Manrope","Segoe UI",system-ui,sans-serif;
   --text:"Atkinson Hyperlegible","Segoe UI",system-ui,sans-serif;
   --bar-hoehe:0px;
+  color-scheme:light;
+}}
+/* Nachtsicht: gedämpfte, dunkle Ansicht – unauffällig und blendfrei.
+   Greift automatisch nach Systemeinstellung, per Hand umschaltbar. */
+@media (prefers-color-scheme:dark){{
+  :root:not([data-theme="hell"]){{
+    --papier:#15121f; --karte:#1e1a2b; --tinte:#f1eef7; --nebel:#a79fc0;
+    --violett:#7c3aed; --violett-tief:#9061f9; --violett-hell:#241c3d;
+    --bernstein:#e2a13c; --rot:#cf3e33; --rot-hell:#2a1512;
+    --linie:#2e293f; --linie-stark:#453d5c;
+    --de:#d9a53d; --at:#e07a72; --ch:#4fbdb0;
+    --schatten:0 1px 3px rgba(0,0,0,.4),0 4px 20px rgba(0,0,0,.35);
+    --werkzeuge-bg:rgba(21,18,31,.94);
+    --rot-rand:#5c2c26; --violett-rand:#3d3159; --platzhalter:#1e1a2b; --platzhalter-schrift:#6b6485;
+    color-scheme:dark;
+  }}
+}}
+:root[data-theme="dunkel"]{{
+  --papier:#15121f; --karte:#1e1a2b; --tinte:#f1eef7; --nebel:#a79fc0;
+  --violett:#7c3aed; --violett-tief:#9061f9; --violett-hell:#241c3d;
+  --bernstein:#e2a13c; --rot:#cf3e33; --rot-hell:#2a1512;
+  --linie:#2e293f; --linie-stark:#453d5c;
+  --de:#d9a53d; --at:#e07a72; --ch:#4fbdb0;
+  --schatten:0 1px 3px rgba(0,0,0,.4),0 4px 20px rgba(0,0,0,.35);
+  --werkzeuge-bg:rgba(21,18,31,.94);
+  --rot-rand:#5c2c26; --violett-rand:#3d3159; --platzhalter:#1e1a2b; --platzhalter-schrift:#6b6485;
+  color-scheme:dark;
 }}
 *{{box-sizing:border-box}}
 html{{scroll-behavior:smooth}}
@@ -193,6 +230,7 @@ body{{
   font-family:var(--text);font-size:17px;line-height:1.55;
   padding-bottom:var(--bar-hoehe);
   -webkit-tap-highlight-color:rgba(75,53,145,.15);
+  transition:background-color .2s ease,color .2s ease;
 }}
 a{{color:var(--violett)}}
 a:focus-visible,button:focus-visible,summary:focus-visible,input:focus-visible,select:focus-visible{{
@@ -205,7 +243,7 @@ a:focus-visible,button:focus-visible,summary:focus-visible,input:focus-visible,s
 .banner{{
   display:block;width:100%;height:clamp(120px,17vw,240px);
   object-fit:cover;object-position:38% center;
-  border-bottom:4px solid var(--violett-tief);background:#eceae6;
+  border-bottom:4px solid var(--violett-tief);background:var(--platzhalter);
 }}
 .kopf{{background:var(--karte);border-bottom:1px solid var(--linie)}}
 .kopf-innen{{max-width:1060px;margin:0 auto;padding:26px 20px 22px;display:flex;gap:18px;align-items:center;flex-wrap:wrap}}
@@ -219,7 +257,7 @@ a:focus-visible,button:focus-visible,summary:focus-visible,input:focus-visible,s
 
 /* ---------- Werkzeugleiste ---------- */
 .werkzeuge{{
-  position:sticky;top:0;z-index:50;background:rgba(255,255,255,.96);
+  position:sticky;top:0;z-index:50;background:var(--werkzeuge-bg);
   backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);
   border-bottom:1px solid var(--linie);box-shadow:0 2px 10px rgba(34,28,51,.05);
 }}
@@ -229,7 +267,7 @@ a:focus-visible,button:focus-visible,summary:focus-visible,input:focus-visible,s
   width:100%;padding:10px 14px 10px 40px;border-radius:10px;border:1.5px solid var(--linie-stark);
   background:var(--karte);color:var(--tinte);font:inherit;font-size:1rem;
 }}
-.suche input::placeholder{{color:#9a95a8}}
+.suche input::placeholder{{color:var(--platzhalter-schrift)}}
 .suche .ic{{position:absolute;left:12px;top:50%;transform:translateY(-50%);color:var(--nebel);pointer-events:none}}
 #themaSprung{{
   flex:1 1 220px;min-width:190px;max-width:340px;
@@ -245,11 +283,24 @@ a:focus-visible,button:focus-visible,summary:focus-visible,input:focus-visible,s
 .land-knopf:last-child{{border-right:none}}
 .land-knopf[aria-pressed="true"]{{background:var(--violett);color:#fff}}
 .land-knopf:not([aria-pressed="true"]):hover{{background:var(--violett-hell);color:var(--violett)}}
+.theme-knopf{{
+  display:flex;align-items:center;gap:7px;flex:none;
+  font-family:var(--display);font-weight:700;font-size:.92rem;
+  padding:9px 14px;border-radius:10px;border:1.5px solid var(--linie-stark);
+  background:var(--karte);color:var(--nebel);cursor:pointer;min-height:44px;
+}}
+.theme-knopf:hover{{border-color:var(--violett);color:var(--violett)}}
+.theme-knopf[aria-pressed="true"]{{background:var(--violett-hell);border-color:var(--violett);color:var(--violett)}}
+.theme-mond{{display:block}}
+.theme-sonne{{display:none}}
+.theme-knopf[aria-pressed="true"] .theme-mond{{display:none}}
+.theme-knopf[aria-pressed="true"] .theme-sonne{{display:block}}
+@media (max-width:700px){{.theme-text{{display:none}}.theme-knopf{{padding:9px 12px}}}}
 
 /* ---------- Notfallstreifen ---------- */
 .sos{{max-width:1060px;margin:20px auto 0;padding:0 20px}}
 .sos-karte{{
-  background:var(--rot-hell);border:1.5px solid #e8c4bd;border-left:5px solid var(--rot);
+  background:var(--rot-hell);border:1.5px solid var(--rot-rand);border-left:5px solid var(--rot);
   border-radius:var(--rund);padding:14px 18px;
 }}
 .sos-karte h2{{font-family:var(--display);font-size:1.05rem;font-weight:800;margin:0 0 8px;color:var(--rot);display:flex;gap:8px;align-items:center}}
@@ -360,7 +411,7 @@ main{{max-width:1060px;margin:0 auto;padding:6px 20px 70px}}
 .signal-text ol{{padding-left:1.3em;margin:.4em 0}}
 .signal-text li{{margin:.3em 0}}
 .signal-hinweis{{
-  background:var(--violett-hell);border:1px solid #d8cdf0;
+  background:var(--violett-hell);border:1px solid var(--violett-rand);
   border-radius:var(--rund-klein);padding:10px 14px;
 }}
 
@@ -409,7 +460,7 @@ footer{{border-top:1px solid var(--linie);background:var(--karte)}}
 .sw-knopf .sw-nr{{font-weight:800;font-size:1.05rem}}
 .sw-knopf .sw-label{{font-size:.72rem;font-weight:700;opacity:.92}}
 .sw-notruf{{background:var(--rot);color:#fff}}
-.sw-polizei{{background:#fff;color:var(--violett-tief)}}
+.sw-polizei{{background:#fff;color:#3e2a78}}
 .sw-weg{{background:#2e8c82;color:#fff}}
 .sw-knopf:active{{filter:brightness(1.12)}}
 @media (max-width:820px){{
@@ -460,6 +511,7 @@ footer{{border-top:1px solid var(--linie);background:var(--karte)}}
 #qrDialog{{
   border:none;border-radius:var(--rund);padding:22px 24px;max-width:340px;width:calc(100vw - 40px);
   box-shadow:0 12px 48px rgba(34,28,51,.35);color:var(--tinte);font-family:var(--text);
+  background:var(--karte);
 }}
 #qrDialog::backdrop{{background:rgba(34,28,51,.55);backdrop-filter:blur(3px)}}
 .qr-kopf{{display:flex;align-items:flex-start;gap:12px}}
@@ -493,7 +545,7 @@ footer{{border-top:1px solid var(--linie);background:var(--karte)}}
   border:none;border-radius:var(--rund);padding:20px 20px 22px;
   max-width:400px;width:calc(100vw - 28px);max-height:calc(100vh - 28px);
   box-shadow:0 12px 48px rgba(34,28,51,.4);color:var(--tinte);
-  font-family:var(--text);overflow:auto;
+  font-family:var(--text);overflow:auto;background:var(--karte);
 }}
 #startDialog::backdrop{{background:rgba(34,28,51,.6);backdrop-filter:blur(3px)}}
 .start-kopf{{display:flex;align-items:center;gap:12px;margin-bottom:16px}}
@@ -516,10 +568,18 @@ footer{{border-top:1px solid var(--linie);background:var(--karte)}}
   justify-content:center;min-height:46px;font-size:.95rem;font-weight:700;
   background:var(--karte);color:var(--nebel);border-style:dashed;
 }}
+.start-weiter{{
+  display:flex;align-items:center;justify-content:center;gap:8px;width:100%;
+  margin-top:16px;min-height:46px;font:inherit;font-family:var(--display);
+  font-weight:700;font-size:.95rem;background:none;color:var(--nebel);
+  border:none;cursor:pointer;padding:8px;
+}}
+.start-weiter:hover{{color:var(--violett)}}
+.start-weiter .ic{{width:1.05em;height:1.05em}}
 .start-landchip{{
   display:inline-flex;align-items:center;gap:6px;margin:0 0 12px;
   font:inherit;font-size:.88rem;font-weight:700;color:var(--violett);
-  background:var(--violett-hell);border:1px solid #d8cdf0;border-radius:999px;
+  background:var(--violett-hell);border:1px solid var(--violett-rand);border-radius:999px;
   padding:6px 14px;cursor:pointer;min-height:36px;
 }}
 .start-landchip:hover{{border-color:var(--violett)}}
@@ -539,11 +599,12 @@ footer{{border-top:1px solid var(--linie);background:var(--karte)}}
   background:#fff;padding:2px;
 }}
 .start-uebersicht{{
-  display:block;width:100%;margin-top:14px;min-height:48px;
-  font-family:var(--display);font-weight:800;font-size:.98rem;
+  display:flex;align-items:center;justify-content:center;gap:8px;width:100%;margin-top:14px;min-height:48px;
+  font-family:var(--display);font-weight:800;font-size:.95rem;text-align:center;
   background:var(--karte);color:var(--violett);border:1.5px solid var(--violett);
-  border-radius:10px;padding:11px;cursor:pointer;
+  border-radius:10px;padding:11px 14px;cursor:pointer;
 }}
+.start-uebersicht .ic{{width:1.05em;height:1.05em;flex:none}}
 .start-uebersicht:hover{{background:var(--violett-hell)}}
 
 /* ---------- Druck ---------- */
@@ -595,6 +656,11 @@ footer{{border-top:1px solid var(--linie);background:var(--karte)}}
       <button class="land-knopf" data-land="at" aria-pressed="false">🇦🇹 AT</button>
       <button class="land-knopf" data-land="ch" aria-pressed="false">🇨🇭 CH</button>
     </div>
+    <button class="theme-knopf" id="themeKnopf" type="button" aria-pressed="false" title="Nachtsicht: dunkle, blendfreie Ansicht">
+      <svg class="ic theme-mond" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+      <svg class="ic theme-sonne" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">{SVG["sun"]}</svg>
+      <span class="theme-text">Nachtsicht</span>
+    </button>
   </div>
 </div>
 
@@ -664,6 +730,7 @@ footer{{border-top:1px solid var(--linie);background:var(--karte)}}
       <button class="start-land" data-land="ch"><span class="start-flagge" aria-hidden="true">🇨🇭</span>Schweiz</button>
       <button class="start-land start-alle" data-land="alle">Alle Länder anzeigen</button>
     </div>
+    <button class="start-weiter" id="startWeiter1">Weiter zur Seite<svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg></button>
   </div>
 
   <div class="start-schritt" id="startSchritt2" hidden>
@@ -686,7 +753,7 @@ footer{{border-top:1px solid var(--linie);background:var(--karte)}}
         <img class="start-hand" src="data:image/webp;base64,{HAND}" alt="" width="34" height="34">
         <span>INFOS! Signal for Help – das stille Handzeichen</span></button>
     </div>
-    <button class="start-uebersicht" id="startUebersicht">Alle Hilfethemen ansehen</button>
+    <button class="start-uebersicht" id="startUebersicht">Weiter zur Seite – alle Hilfethemen ansehen<svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg></button>
   </div>
 </dialog>
 
@@ -739,6 +806,54 @@ footer{{border-top:1px solid var(--linie);background:var(--karte)}}
 <script>
 (function(){{
   "use strict";
+
+  // ----- Nachtsicht: Umschalter, Systemerkennung, theme-color-Meta -----
+  var themeKnopf = document.getElementById("themeKnopf");
+  var systemDunkel = window.matchMedia("(prefers-color-scheme: dark)");
+  var themeMeta = document.querySelector('meta[name="theme-color"]');
+
+  function gespeichertesTheme(){{
+    try {{ return localStorage.getItem("fw-theme"); }} catch (e) {{ return null; }}
+  }}
+  function themeMerken(wert){{
+    try {{
+      if (wert) localStorage.setItem("fw-theme", wert);
+      else localStorage.removeItem("fw-theme");
+    }} catch (e) {{ /* z. B. Privatmodus */ }}
+  }}
+  function effektivDunkel(){{
+    var gespeichert = gespeichertesTheme();
+    if (gespeichert === "dunkel") return true;
+    if (gespeichert === "hell") return false;
+    return systemDunkel.matches;
+  }}
+  function themeAnzeigeAktualisieren(){{
+    var dunkel = effektivDunkel();
+    themeKnopf.setAttribute("aria-pressed", dunkel ? "true" : "false");
+    themeKnopf.querySelector(".theme-text").textContent = dunkel ? "Tagsicht" : "Nachtsicht";
+    if (themeMeta) themeMeta.setAttribute("content", dunkel ? "#15121f" : "#3e2a78");
+  }}
+  themeKnopf.addEventListener("click", function(){{
+    var neuDunkel = !effektivDunkel();
+    // Stimmt die Wahl zufällig wieder mit der Systemeinstellung überein,
+    // wird nichts mehr gespeichert – dann folgt die Seite wieder automatisch dem System.
+    if (neuDunkel === systemDunkel.matches) {{
+      document.documentElement.removeAttribute("data-theme");
+      themeMerken(null);
+    }} else {{
+      var wert = neuDunkel ? "dunkel" : "hell";
+      document.documentElement.setAttribute("data-theme", wert);
+      themeMerken(wert);
+    }}
+    themeAnzeigeAktualisieren();
+  }});
+  if (systemDunkel.addEventListener) {{
+    systemDunkel.addEventListener("change", function(){{
+      if (!gespeichertesTheme()) themeAnzeigeAktualisieren();
+    }});
+  }}
+  themeAnzeigeAktualisieren();
+
   var aktivesLand = "alle";
   var suchEingabe = document.getElementById("sucheingabe");
   var themen = Array.prototype.slice.call(document.querySelectorAll(".thema"));
@@ -986,6 +1101,9 @@ footer{{border-top:1px solid var(--linie);background:var(--karte)}}
       }});
     }});
     document.getElementById("startLandChip").addEventListener("click", startSchritt1);
+    document.getElementById("startWeiter1").addEventListener("click", function(){{
+      startDialog.close();
+    }});
     startDialog.querySelectorAll(".start-punkt").forEach(function(knopf){{
       knopf.addEventListener("click", function(){{
         startDialog.close();

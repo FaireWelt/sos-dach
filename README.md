@@ -63,6 +63,39 @@ Verschlüsselung steht und fällt damit. Die Berechtigung anfragender Stellen wi
 **persönlich** geprüft (z. B. Rückruf über die offizielle Amtsnummer), bevor das
 Passwort vergeben wird – eine automatische „Behörden-Erkennung“ gibt es im Web nicht.
 
+## Eigene Domain einrichten (z. B. sos-dach.info)
+
+Damit in der Adresszeile `sos-dach.info` statt `fairewelt.github.io/sos-dach`
+steht, sind drei Schritte nötig – die Datei dafür liegt schon bereit:
+
+1. **Domain registrieren** (falls noch nicht geschehen), z. B. bei IONOS,
+   Namecheap, INWX oder Cloudflare Registrar. Das kann nur der jeweilige
+   Anbieter erledigen, nicht GitHub.
+
+2. **DNS-Einträge beim Domain-Anbieter setzen** (im dortigen DNS-Verwaltungsbereich):
+
+   | Typ | Name | Ziel |
+   |---|---|---|
+   | A | @ (oder leer) | `185.199.108.153` |
+   | A | @ (oder leer) | `185.199.109.153` |
+   | A | @ (oder leer) | `185.199.110.153` |
+   | A | @ (oder leer) | `185.199.111.153` |
+   | CNAME | www | `fairewelt.github.io` |
+
+   (Die vier A-Einträge sind die offiziellen GitHub-Pages-Server; steht
+   `www.sos-dach.info` nicht zur Verfügung, kann der CNAME-Eintrag entfallen.)
+
+3. **Domain in GitHub hinterlegen:** Die Datei `CNAME` (ohne Dateiendung, im
+   Root des Repos, liegt bereits bei) enthält `sos-dach.info`. Danach im
+   Repository unter **Settings → Pages → Custom domain** ebenfalls
+   `sos-dach.info` eintragen und speichern. GitHub prüft die DNS-Einträge
+   automatisch (kann bis zu 24 Stunden dauern) und bietet danach den Schalter
+   **„Enforce HTTPS"** an – den unbedingt aktivieren, damit die Verbindung
+   verschlüsselt ist (wichtig bei einer Hilfeseite!).
+
+Bis die DNS-Änderung überall verbreitet ist, bleibt `fairewelt.github.io/sos-dach`
+parallel erreichbar – nichts geht kaputt, es kommt nur eine zweite Adresse hinzu.
+
 ## Nummern ändern oder ergänzen
 
 1. In `werkzeug/data.py` bzw. `werkzeug/data2.py` den Eintrag anpassen
